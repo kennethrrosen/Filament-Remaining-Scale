@@ -10,7 +10,7 @@ Note: Tested using Arduino IDE ver 1.8.9 via VS Code
 */
 
 
-#define ProgName "Questionable Mechanics SpoolScale_VER1.07"
+#define ProgName "QM Ender 5 Scale"
  
 #include <LiquidCrystal_I2C.h>
 #include <Bounce2.h>
@@ -24,7 +24,7 @@ const int LOADCELL_SCK_PIN = 15;
 
 #define I2C_ADDR    0x27
 
-LiquidCrystal_I2C lcd(0x27,20,4); //I2C SCLK=A5, SDATA=A4 depends on board
+LiquidCrystal_I2C lcd(0x27,20,4); //I2C SCLK=A4, SDATA=A5 depends on board
 HX711 scale;
 
 
@@ -183,7 +183,7 @@ uint8_t Enc_PB_UpEdge=HIGH;
 uint8_t Enc_PB_Last_value=HIGH;
 
 //Instantiate an 'Encoder object' for the rotary encoder control
-Encoder Enc_Knob(EncPin_A,EncPin_B);		//Wire Rotary encoder to pins 2 & 3 (These are Nano Interrupt Pins!)
+Encoder Enc_Knob(EncPin_B, EncPin_A);		//Wire Rotary encoder to pins 2 & 3 (These are Nano Interrupt Pins!)
 //Instantiate a 'Bounce object' for the Encoder Push Button
 Bounce Enc_PB_debounce = Bounce(); 
 //========== END ROTARY ENCODER DEFINITIONS ======================================================
@@ -1915,7 +1915,6 @@ void dumpFilamentDB(){
 void setup()
 {
 	Serial.begin(115200);		//Open Serial debug port
-	//delay(1000);				//Time for Serial Startup?? TODO Remove this line!
 	//Set-up Encoder Push Button pin assignment and INPUT with an internal pull-up resistor
 	pinMode(EncPB_Pin,INPUT_PULLUP);
 	// After setting up the button, set-up the Bounce instance :
@@ -1952,10 +1951,10 @@ void setup()
 	lcd.print(ProgName);  
 	lcd.setCursor ( 0, 1 );     // go to the next line
 	lcd.print(F("    "));
-	lcd.print (__DATE__);		//Printout Compiled Data and Time
+	lcd.print (__DATE__);		//Printout Compiled Date and Time
 	lcd.setCursor ( 0, 2 );      // go to the next line
 	lcd.print(F("     "));
-	lcd.print (__TIME__);		//Printout Compiled Data and Time
+	lcd.print (__TIME__);		//Printout Compiled Date and Time
 	
 	//Upload custom symbols to LCD display
 	for ( int i = 0; i < SYM_BitmapSize; i++ ) {
@@ -2025,7 +2024,7 @@ void setup()
 										// using the Rotary Dial control. After calibration, a new value is stored into EEPROM for recall every powerup
 										//ALTERNATELY, see the HX711 README file for more details on how to do this using HX711_full_example program.
 	
-	//scale.tare();				    	//Uncomment this if you want to AUTO TARE every time you power up
+	scale.tare();				    	//Uncomment this if you want to AUTO TARE every time you power up
 										//	|  This is NOT RECOMMENDED as it requires the user to	|
 										//	|  remove filament spool from SCALE at every power-up	|
 										//INSTEAD,SpoolScale INCLUDES a built-in ZERO function that can be periodically run by the operator using the Rotary Dial control. 
@@ -2197,9 +2196,5 @@ void loop(){
 			
 		}
 		lcd_clearRow(3);
-	}	//============= END MENU LOOP ==============================
-	
-	
-	//Just for fun, toggle LED at a "loop Rate" ...The LED will flicker during normal operation...If it is ever OFF or STEADY, main loop is not running!
-	if (digitalRead(StatusLedPin)==HIGH) digitalWrite(StatusLedPin,LOW); else digitalWrite(StatusLedPin,HIGH);	//Turn LED ON
+	}
 }
